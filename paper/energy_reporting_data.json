@@ -1,0 +1,15 @@
+{
+  "detailed_results": [
+    {
+      "venue": "ICML 2020",
+      "total": 2,
+      "sampled": 2,
+      "energy_papers": 0,
+      "rate": 0.0,
+      "examples": []
+    }
+  ],
+  "yearly_combined_rates": {
+    "2020": 0.0
+  }
+}

@@ -1,0 +1,655 @@
+%%%%%%%% ICML 2026 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % for professional tables
+
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2026} with \usepackage[nohyperref]{icml2026} above.
+\usepackage{hyperref}
+
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Use the following line for the initial blind version submitted for review:
+% \usepackage{icml2026}
+
+% For preprint, use
+% \usepackage[preprint]{icml2026}
+
+% If accepted, instead use the following line for the camera-ready submission:
+\usepackage[accepted]{icml2026}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{Position: Carbon Footprint Reporting Should Be Routine in ML Research}
+
+\begin{document}
+
+\twocolumn[
+  \icmltitle{Position: Carbon Footprint Reporting Should Be Routine \\ in Machine Learning Research}
+
+  % It is OKAY to include author information, even for blind submissions: the
+  % style file will automatically remove it for you unless you've provided
+  % the [accepted] option to the icml2026 package.
+
+  % List of affiliations: The first argument should be a (short) identifier you
+  % will use later to specify author affiliations Academic affiliations
+  % should list Department, University, City, Region, Country Industry
+  % affiliations should list Company, City, Region, Country
+
+  % You can specify symbols, otherwise they are numbered in order. Ideally, you
+  % should not use this facility. Affiliations will be numbered in order of
+  % appearance and this is the preferred way.
+  \icmlsetsymbol{equal}{*}
+
+  \begin{icmlauthorlist}
+    \icmlauthor{Guan-Ming Chiu}{ntu}
+  \end{icmlauthorlist}
+
+  \icmlaffiliation{ntu}{National Taiwan University, Taipei, Taiwan}
+
+  \icmlcorrespondingauthor{Guan-Ming Chiu}{gmchiu@arbor.ntu.edu.tw}
+
+  % You may provide any keywords that you find helpful for describing your
+  % paper; these are used to populate the "keywords" metadata in the PDF but
+  % will not be shown in the document
+  \icmlkeywords{Green AI, Carbon Footprint, Sustainable Computing, Energy Efficiency, Responsible AI}
+
+  \vskip 0.3in
+]
+
+% this must go after the closing bracket ] following \twocolumn[ ...
+
+% This command actually creates the footnote in the first column listing the
+% affiliations and the copyright notice. The command takes one argument, which
+% is text to display at the start of the footnote. The \icmlEqualContribution
+% command is standard text for equal contribution. Remove it (just {}) if you
+% do not need this facility.
+
+% Use ONE of the following lines. DO NOT remove the command.
+% If you have no special notice, KEEP empty braces:
+\printAffiliationsAndNotice{}  % no special notice (required even if empty)
+% Or, if applicable, use the standard equal contribution text:
+% \printAffiliationsAndNotice{\icmlEqualContribution}
+
+\begin{abstract}
+In this position paper, we argue that the machine learning community should adopt standardized carbon footprint reporting as part of routine scientific practice. Training large models can emit hundreds of tons of CO$_2$, yet environmental costs remain largely invisible in publications. We contend that without energy and emissions metrics, claims of model efficiency are incomplete: a method cannot be deemed ``efficient'' without specifying efficient at what. This gap undermines scientific rigor and reproducibility, as identical experiments in different locations yield vastly different carbon footprints. We put forth reporting guidelines comprising five standardized metrics, practical measurement tools, and integration with community benchmarks, with a phased three-stage adoption process. We address alternative views, including concerns about measurement complexity and potential barriers for resource-limited researchers. To promote equity, we advocate for dual reporting of energy and carbon, reference-grid normalization, and acceptance of approximate estimates. This paper calls on venues, reviewers, authors, and institutions to establish carbon awareness as a foundational element of responsible ML research.
+\end{abstract}
+
+\section{Introduction}
+
+Machine learning progress has a cost our community rarely quantifies: the energy consumed and carbon emitted during training and deployment. A typical ML paper specifies GPU types, training duration, and hyperparameters in detail, yet omits energy consumption or carbon emissions entirely. This asymmetry reflects a blind spot in our scientific culture.
+
+The environmental impact is substantial. Training a Transformer model with neural architecture search can emit as much carbon as five cars over their lifetimes \cite{strubell2019energy}. Computational requirements have increased roughly 10$\times$ every two years \cite{sevilla2022compute}, and data centers now consume 1--2\% of global electricity \cite{masanet2020recalibrating,xiao2025environmental}.
+
+\begin{figure}[t]
+\vspace{0.5em}
+\begin{center}
+\includegraphics[width=0.95\columnwidth]{figures/carbon_by_model}
+\end{center}
+\caption{Officially published carbon emissions for training major language models (training-phase only).\footnotemark\ Variation reflects model scale and infrastructure: BLOOM (25 tons) used low-carbon French grid; Llama-3.1 405B is the largest disclosed at 8,930 tons (the full Llama-3.1 family of 8B/70B/405B totals 11,390 tons). Methodologies vary; direct comparisons require caution.}
+\label{fig:carbon-models}
+\end{figure}
+
+\footnotetext{Data sources: BERT \cite{strubell2019energy}; T5, Meena, GShard-600B, GPT-3 \cite{patterson2021carbon}; OPT-175B \cite{zhang2022opt}; BLOOM, Gopher \cite{luccioni2023estimating}; Llama-2 \cite{touvron2023llama2}; Llama-3.1 \cite{meta2024llama31}.}
+
+As shown in Figure~\ref{fig:carbon-models}, emissions vary dramatically: GPT-3 emitted 552 tons \cite{patterson2021carbon}, while BLOOM achieved comparable scale at just 25 tons using France's nuclear-powered grid \cite{luccioni2023estimating}. This variation demonstrates how much infrastructure choices matter, yet most model announcements omit environmental costs entirely.
+
+We argue that \textbf{standardized carbon footprint reporting should become a routine component of ML research publications}. Without energy and emissions metrics, efficiency claims lack scientific rigor.
+
+This is not environmental activism but scientific completeness. Physicists report energy in collision experiments; chemists report temperature in synthesis protocols. ML researchers claiming efficient methods should report energy consumption. Our position rests on four observations: (1) efficiency claims require specifying efficient \textit{at what} (FLOPs, energy, carbon, or dollars); (2) reproducibility demands environmental context, as identical experiments in different locations yield vastly different carbon footprints; (3) the field lacks baselines to track sustainability over time; and (4) awareness plausibly drives change---while direct empirical evidence in ML is limited, analogous norms in other fields (code release, reproducibility checklists) suggest that what gets measured gets improved.
+
+Now is the time to act. Measurement tools exist, researcher awareness is growing, and prominent releases including BLOOM, OPT, and Llama have already included carbon data, proving such reporting is feasible.
+
+\section{Related Work}
+
+Green computing research has studied data center efficiency for decades \cite{masanet2020recalibrating}. Within ML, Schwartz et al. introduced ``Green AI'' \cite{schwartz2020green}, and Strubell et al. brought attention to NLP's carbon costs \cite{strubell2019energy}. Patterson et al. provided refined estimates for large-scale training \cite{patterson2021carbon}, while Luccioni et al. documented BLOOM's carbon footprint \cite{luccioni2023estimating}. Lottick et al. framed energy reporting as algorithmic accountability \cite{lottick2019energy}, and recent work extends carbon analysis to adversarial ML and security domains \cite{hasan2024sustainable}. K.C. et al. demonstrate that per-experiment carbon tracking is feasible beyond NLP and vision, integrating real-time CodeCarbon monitoring into cybersecurity anomaly detection workflows \cite{kc2025ecofriendly}. Henderson et al. found that the vast majority of papers at major venues omit energy data entirely \cite{henderson2020towards}.
+
+Our proposal draws on precedents from other fields: climate science frameworks for reporting uncertainty, medical research's CONSORT standards,\footnote{Consolidated Standards of Reporting Trials, a guideline for reporting randomized controlled trials in medicine.} software engineering norms for code sharing, and prior work on structured reporting in ML \cite{dodge2019show}. Other scientific disciplines have begun addressing research carbon footprints, including astronomy \cite{knodlseder2022astronomy}.
+
+The scaling laws literature provides context for carbon costs. Kaplan et al. established performance power laws with respect to compute \cite{kaplan2020scaling}, and Hoffmann et al. showed that training smaller models on more data can achieve equivalent performance at lower cost \cite{hoffmann2022training}. Recent work has expanded understanding of ML's footprint: MLPerf Power\footnote{An industry benchmark suite for measuring ML system performance and energy efficiency.} established standardized efficiency measurement methodology \cite{tschand2025mlperf}; studies show inference energy can exceed training costs for deployed models \cite{jegham2025hungry,fernandez2025energy}; analyses project substantial increases in AI electricity demand \cite{xiao2025environmental}; and green AI techniques demonstrate 40--60\% energy reductions without performance degradation \cite{verdecchia2025green}.
+
+Several recent efforts have developed carbon-aware ML systems: OpenCarbonEval provides unified emission estimation \cite{yu2024opencarboneval}; Clover enables carbon-aware inference routing \cite{li2023clover}; and CAFE addresses carbon-aware federated learning across distributed data centers \cite{bian2023cafe}. We argue these technical advances should be complemented by venue-level reporting standards, and offer concrete metrics, templates, and a phased adoption timeline toward this goal.
+
+\section{The Current State of Carbon Reporting in ML}
+
+Despite growing awareness of computational sustainability, carbon footprint reporting remains rare in ML publications. Henderson et al. conducted a systematic survey of 100 randomly sampled NeurIPS 2019 papers and found striking results: zero papers reported carbon impacts, only 1\% reported any energy metrics, and just 17\% reported compute-related metrics such as GPU-hours \cite{henderson2020towards}. While awareness has grown since 2019, reporting remains the exception rather than the rule.
+
+\subsection{What Gets Reported}
+
+The standard computational details section of an ML paper typically includes hardware specifications such as GPU model, memory, and number of devices; training duration in wall-clock time or epochs; hyperparameters and optimization details; and dataset sizes with preprocessing steps. These details serve reproducibility but say nothing about environmental impact. A researcher reading that a model trained for 72 hours on 8 A100 GPUs cannot determine whether the experiment emitted 50 kg or 500 kg of CO$_2$ without additional information about data center location and energy sources.
+
+\subsection{Why Reporting Matters for Science}
+
+The absence of energy metrics creates several problems for scientific practice:
+
+\textbf{Incomplete efficiency claims.} When a paper claims a model is ``more efficient,'' this typically means fewer FLOPs or faster inference. But FLOPs do not map linearly to energy consumption. Memory access patterns, hardware utilization, and batch sizes all affect energy use independently of operation counts. A model with 20\% fewer FLOPs might consume the same energy if it has worse memory locality. \citet{gowda2023watt} directly demonstrate that reducing FLOPs or parameters does not reliably yield proportional energy savings, because energy is governed by hardware-dependent factors such as memory access and GPU utilization; \citet{desislavov2023trends}, analyzing 94 ImageNet models, similarly find that the relationship between operations and energy is mediated by hardware efficiency rather than a simple linear mapping. Software-based power meters can themselves disagree with hardware meters by margins of comparable size \cite{jay2023experimental}, so moderate FLOP reductions can be entirely absorbed by non-compute costs and measurement variance.
+
+\textbf{Non-reproducible comparisons.} Two research groups comparing methods on identical hardware may get different energy results depending on their locations. A GPU cluster in Quebec (hydroelectric grid, approximately 20 gCO$_2$/kWh) produces roughly 25$\times$ less carbon than one in Poland (coal-heavy grid, approximately 500 gCO$_2$/kWh) for the same computation \cite{lacoste2019quantifying}. Without location data, carbon comparisons across papers become uninterpretable. Energy comparisons (kWh) and algorithmic efficiency metrics (FLOPs per token) remain valid without location data, but carbon footprint claims require this context.
+
+\textbf{Hidden costs of progress.} When we celebrate a new state-of-the-art result, we rarely ask what it cost to achieve. The computational experiments behind a single paper can range from tens of GPU-hours to millions. Without systematic reporting, we cannot assess whether marginal accuracy gains justify orders-of-magnitude increases in compute.
+
+\textbf{Lack of optimization incentives.} When energy costs are invisible, researchers have no incentive to optimize for them. A training run that uses 2$\times$ more energy than necessary due to suboptimal batch sizes or learning rate schedules will produce the same paper as an efficient run. If energy were reported, reviewers and readers could recognize and appreciate efficient implementations, creating positive incentives for carbon-conscious research practices.
+
+\subsection{A Worked Example}
+
+Consider two research groups training identical models with 4 V100 GPUs for 24 hours. Group A operates in Norway (29 gCO$_2$/kWh, PUE 1.1); Group B in Australia (650 gCO$_2$/kWh, PUE 1.4). Both consume $\sim$24 kWh of GPU energy (4 GPUs $\times$ 24 h $\times$ 0.25 kW) with identical GPU-hours, yet PUE and local grid intensity widen emissions $\sim$28$\times$: $\sim$0.8 vs $\sim$22 kgCO$_2$eq. Without location data, these experiments appear equivalent on paper, and a reader cannot tell whether ``efficiency'' came from algorithmic gains or a low-carbon grid; Figure~\ref{fig:regional-variation} visualizes how this gap widens.
+
+\begin{figure}[t]
+\vspace{0.5em}
+\begin{center}
+\includegraphics[width=0.95\columnwidth]{figures/regional_comparison}
+\end{center}
+\caption{Regional variation in grid carbon intensity and resulting emissions for 1000 GPU-hours, ranging from 6 kg in Quebec to 195 kg in Australia.}
+\label{fig:regional-variation}
+\end{figure}
+
+\subsection{Quantifying the Costs}
+\label{sec:quantifying-costs}
+
+To make the economic and environmental stakes concrete, we summarize publicly disclosed costs for representative systems (full breakdown in Table~\ref{tab:cost-quantification}, Appendix~\ref{app:reference}). Training GPT-3 \cite{patterson2021carbon} cost roughly \$154{,}000 in electricity at average US industrial rates; Llama-3.1 405B \cite{dubey2024llama3} emitted carbon comparable to the annual emissions of about 2{,}200 average US households; and at deployment scale a model serving 10M queries per day at $\sim$0.003 kWh/query (representative of large generative model inference \cite{luccioni2024power,samsi2023words}) consumes on the order of 10{,}950 MWh per year, which can exceed training within months. Set against the survey above, where 91.0\% of papers report no energy data, costs of this magnitude remain effectively invisible across the vast majority of published research.
+
+\subsection{How Often Do Papers Report Carbon? An ICML 2025 Survey}
+\label{sec:icml2025-survey}
+
+To quantify how the gap has evolved since 2019, we surveyed 1{,}000 randomly sampled ICML 2025 accepted papers (from 3{,}260 total) using automated keyword matching with manual verification across three categories: compute metadata, energy data, and carbon data. Analysis code and per-paper results are released alongside this paper. Figure~\ref{fig:survey-comparison} contrasts our results with the NeurIPS 2019 baseline of \citet{henderson2020towards}.
+
+\begin{figure}[b]
+\begin{center}
+\includegraphics[width=0.98\columnwidth]{figures/reporting_gap}
+\end{center}
+\caption{Reporting rates for compute, energy, and carbon metadata: NeurIPS 2019 \cite{henderson2020towards} versus our ICML 2025 survey. ``All three'' was not separately reported in 2019.}
+\label{fig:survey-comparison}
+\end{figure}
+
+Compute metadata reporting has grown substantially (17\% to 57.3\%), plausibly reflecting reproducibility checklists and venue-level expectations. Yet energy and carbon reporting remain in single digits despite high-profile disclosures from BLOOM, OPT, and Llama. Energy (9.0\%) and carbon (5.9\%) reporting today resemble compute reporting circa 2019: this is the awareness-action gap our paper identifies, and our proposal aims to catalyze a similar trajectory through clear expectations, templates, and gradual normalization.
+
+\subsection{Existing Tools and Their Limitations}
+
+Several tools exist for measuring ML carbon footprints: CodeCarbon \cite{codecarbon2020}, ML CO2 Impact\footnote{ML CO2 Impact calculator: \url{https://mlco2.github.io/impact/}} \cite{lacoste2019quantifying}, Carbontracker \cite{anthony2020carbontracker}, and experiment-impact-tracker \cite{henderson2020towards}. These tools can estimate energy consumption and convert it to carbon emissions using regional grid intensity data.
+
+However, tool availability has not led to widespread adoption, primarily because venues do not encourage or reward carbon reporting.
+
+\subsection{The Gap Between Awareness and Action}
+
+The ML community is aware of environmental concerns: workshops on climate change and AI regularly draw submissions, and papers on efficient methods often mention environmental benefits. Yet this awareness rarely translates into consistent reporting.
+
+Several factors explain this gap. First, there is no template. Authors who want to report carbon footprint must decide what to measure, how to measure it, and how to present results. Without guidance, many default to reporting nothing. Second, there is no enforcement. Reviewers do not expect carbon data, so its absence is not penalized. Third, there is uncertainty about accuracy. Researchers worry that imprecise estimates will be criticized, so they prefer to omit data rather than report uncertain figures.
+
+This pattern is not unique to environmental reporting. The field has faced similar challenges with statistical practices (e.g., reporting confidence intervals), code release (now expected), and dataset documentation. In each case, progress required venues to establish clear expectations and provide templates that make compliance straightforward.
+
+\section{Proposed Reporting Guidelines}
+
+The gap between awareness and action described above will not close on its own. Without concrete standards, authors face uncertainty about what to report and how, leading most to report nothing. Standardization reduces this friction by providing clear templates and shared expectations.
+
+We propose standardized reporting guidelines for carbon footprint in ML research. The goal is straightforward: every paper should report the energy consumed and carbon emitted by its experiments, using consistent metrics that enable comparison across studies. Our guidelines prioritize practicality over perfection---estimates with acknowledged uncertainty are preferable to no data at all.
+
+\subsection{Standardized Metrics for Reporting}
+
+The following metrics align with established carbon accounting standards: the Greenhouse Gas Protocol \cite{ghgprotocol2004} for organizational carbon accounting\footnote{ISO 14064-1:2018 provides complementary international standards for emissions verification.} and the Software Carbon Intensity (SCI) specification \cite{greensoftware2022sci} for software applications.
+
+Building on these frameworks, papers should report five key metrics where applicable:
+
+\begin{enumerate}
+    \item \textbf{Total energy consumption (kWh):} Direct measurement via hardware power meters provides the most accurate values. When unavailable, software-based tools such as CodeCarbon, Carbontracker, or nvidia-smi can provide reasonable estimates, though researchers should acknowledge measurement uncertainty \cite{jay2023experimental}. For cloud workloads, providers increasingly offer energy consumption data through APIs and dashboards.
+
+    \item \textbf{Carbon emissions (kgCO$_2$eq):} Calculated by multiplying energy consumption by grid carbon intensity, following the methodology outlined in the GHG Protocol. The unit kgCO$_2$eq (kilograms of carbon dioxide equivalent) accounts for all greenhouse gases converted to their CO$_2$ warming potential.
+
+    \item \textbf{Grid carbon intensity (gCO$_2$/kWh):} This value varies dramatically by region, from approximately 20 gCO$_2$/kWh in hydroelectric-dominated Quebec to over 700 gCO$_2$/kWh in coal-heavy grids. Researchers should cite their data source, such as regional grid operators, Electricity Maps\footnote{\url{https://electricitymaps.com}} \cite{electricitymap2023}, or annual averages from governmental statistics. Time-of-use variations can also be significant.
+
+    \item \textbf{Power Usage Effectiveness (PUE):} This ratio captures data center overhead including cooling, lighting, and power distribution losses. A PUE of 1.0 represents perfect efficiency; typical values range from 1.1 for hyperscale cloud data centers to 1.5 or higher for older academic facilities. When unknown, a conservative estimate of 1.2--1.4 should be stated explicitly.
+
+    \item \textbf{Compute region:} The geographic location (country, state, or cloud availability zone) enables readers to verify or recalculate carbon estimates and facilitates meta-analyses across studies.
+\end{enumerate}
+
+Following the GHG Protocol's emissions categorization, ML training typically falls under Scope 2 (purchased electricity), while Scope 3 includes embodied carbon from hardware manufacturing and supply chain emissions \cite{gupta2022chasing}. For comprehensive lifecycle assessment, researchers conducting large-scale training should consider reporting embodied carbon estimates, though we recognize this requires additional data that may not always be available \cite{ligozat2022unraveling}.
+
+For cloud experiments, Google Cloud, Microsoft Azure, and AWS all offer carbon footprint dashboards that researchers can cite directly.
+
+\textbf{Water footprint as a supplementary metric.} Beyond electricity, data center cooling consumes substantial freshwater. \citet{li2023water} estimate that training GPT-3 in Microsoft's US data centers consumed on the order of 700{,}000 liters of freshwater, with comparable off-site water tied to electricity generation. Because measurement tools for water are less mature than for energy and carbon, we recommend water footprint (in liters or m$^3$) as a \emph{supplementary} metric for large-scale training. Where direct measurement is infeasible, authors can cite published water usage effectiveness (WUE) values for their data center or region.
+
+\subsection{Measurement Tools and Carbon-Aware Benchmarks}
+\label{sec:tools-benchmarks}
+
+Adoption of carbon reporting depends heavily on reducing friction. Several open-source tools already exist for this purpose, including CodeCarbon \cite{codecarbon2020}, Carbontracker \cite{anthony2020carbontracker}, and experiment-impact-tracker \cite{henderson2020towards}. Software-based estimates generally track hardware measurements within 20--30\% for GPU-intensive workloads, which is sufficient for the transparency goals of carbon reporting. Even with this uncertainty, cross-paper comparisons remain meaningful: a 10$\times$ difference between methods is clearly distinguishable from measurement noise, and trend analysis across hundreds of papers will average out individual errors.
+
+Ideally, measurement should require minimal code changes. Decorators or context managers make tracking nearly invisible:
+
+\begin{verbatim}
+@track_emissions(project="training")
+def train():
+    model.fit(X, y, epochs=100)
+\end{verbatim}
+
+Output formats should be standardized across tools, and HPC clusters should enable job-level energy accounting through schedulers like SLURM.\footnote{Simple Linux Utility for Resource Management, a widely used workload manager for high-performance computing clusters.}
+
+Beyond paper reporting, community benchmarks should incorporate carbon metrics. MLPerf Power has established methodology for standardized efficiency benchmarking \cite{tschand2025mlperf}. Leaderboards could display carbon cost per accuracy point, enabling identification of Pareto-optimal models. Green AI techniques can reduce energy consumption substantially \cite{verdecchia2025green}, but these gains remain invisible without carbon-aware evaluation.
+
+\subsection{Choice of Reporting Primitives}
+
+Different reporting units serve different purposes, and the community must choose which primitives to standardize. We consider several candidates and their tradeoffs:
+
+\textbf{Energy-based primitives.} Metrics like kWh (total energy) or Wh/1000 tokens (energy intensity) measure physical resource consumption independent of location. These are reproducible and enable fair comparison of algorithmic efficiency across institutions. However, they do not capture environmental impact, which depends on carbon intensity.
+
+\textbf{Carbon-based primitives.} Metrics like kgCO$_2$eq (total emissions) or gCO$_2$/1000 tokens directly measure environmental impact. These are the ultimate quantity of interest for sustainability but depend on location and infrastructure, making cross-study comparison difficult without normalization.
+
+\textbf{Compute-normalized metrics.} Metrics like kWh/billion parameters or gCO$_2$/accuracy-point enable comparison across models of different scales. These are useful for identifying efficient architectures but require careful definition of the denominator.
+
+\textbf{System vs. paper-level reporting.} Benchmarks like MLPerf Power \cite{tschand2025mlperf} measure system efficiency under controlled conditions (fixed hardware, standardized workloads, comparable environments). Paper-level reporting captures the full cost of research including failed experiments and hyperparameter search. Both are valuable: system benchmarks enable hardware comparison while paper-level reporting provides scientific transparency.
+
+We recommend a layered approach: papers should report \textit{both} energy (kWh) and carbon (kgCO$_2$eq), along with the inputs needed to verify the calculation (grid intensity, PUE, region). This enables readers to compare energy efficiency directly while understanding the carbon implications. For inference, standardized benchmarks (e.g., Wh per 1000 tokens at batch size 32) complement paper-specific totals.
+
+\subsection{Reporting Training and Inference Separately}
+
+Training and inference have fundamentally different carbon characteristics and must be reported separately \cite{luccioni2024power,samsi2023words,wu2022sustainable,jegham2025hungry}.
+
+\textbf{Training carbon} is a one-time, upfront investment. It scales with model size following established scaling laws: larger models require more compute, and compute requirements grow polynomially with parameter count \cite{kaplan2020scaling,hoffmann2022training}. The Chinchilla scaling laws suggest that compute-optimal training involves more tokens rather than simply larger models \cite{hoffmann2022training}. Training can be scheduled strategically to exploit periods of low grid carbon intensity or high renewable availability \cite{dodge2022measuring}, and recent work on multi-day carbon intensity forecasting enables predictive rather than reactive scheduling \cite{maji2023forecasting}. Once complete, training carbon can be amortized across all downstream applications.
+
+\textbf{Inference carbon} accumulates continuously with each query served. Recent studies demonstrate that inference energy follows different scaling relationships than training \cite{desislavov2023trends,samsi2023words,fernandez2025energy}. Energy per token decreases with batch size but increases with sequence length. A large language model can consume several kWh per 1000 queries depending on model size, hardware, and configuration \cite{luccioni2024power}. For frontier models like GPT-3 \cite{brown2020language} or Llama \cite{touvron2023llama2} deployed at massive scale, inference emissions can exceed training emissions within weeks or months \cite{chien2024reducing}.
+
+This distinction has critical implications. Research papers typically report only training costs, but commercially deployed models incur ongoing inference costs that dwarf training investments. Papers should report training carbon with methodology details, and model releases should include standardized inference energy benchmarks to enable lifecycle carbon assessment.
+
+Inference benchmarks must be domain-specific. For example, language models might report energy per 1000 tokens at specified batch sizes, while vision models might use energy per 1000 images. Classical ML, recommendation systems \cite{wegmeth2025green}, and AutoML have different profiles where per-sample metrics may be more appropriate. The key principle is standardization within each domain to enable fair comparison, while acknowledging that production deployments involve additional complexity that simplified benchmarks do not fully capture.
+
+\subsection{Measurement Protocol}
+
+To enable meaningful comparisons across papers, we propose a minimal viable protocol that specifies not just which metrics to report, but how to measure them. This protocol prioritizes comparability and transparency while acknowledging practical constraints.
+
+\textbf{How to measure.} Report average power draw during the measurement period, not peak power or TDP, as nameplate ratings can overestimate by 20--40\%. When using software-based tools, specify the sampling interval (e.g., 1-second intervals for CodeCarbon); for hardware power meters, specify the measurement point (GPU only, server, or rack-level). Software-based tools have known limitations, so report confidence intervals rather than false precision (e.g., ``approximately 150 kWh $\pm$20\%'' rather than ``153.7 kWh''). When possible, cross-validate estimates using multiple tools.
+
+\textbf{What to include.} Clearly define what computation is included. The ``final reported experiments'' boundary should include all training runs whose results appear in the paper, final evaluation runs, and any experiment-specific preprocessing. Pre-trained weights need not be counted, but authors should cite reported training emissions of base models when available. When results are averaged across $n$ runs, report total energy ($n \times$ single-run), not per-run averages. Report hyperparameter search separately from final training: ``Final training: X kWh; Hyperparameter search: Y kWh (Z configurations evaluated).''
+
+\textbf{How to report.} For multi-location compute, report contributions separately with location-specific carbon intensities, then provide a total (e.g., ``Location A (Quebec): 500 kWh, 10 kgCO$_2$eq; Location B (Germany): 300 kWh, 105 kgCO$_2$eq; Total: 800 kWh, 115 kgCO$_2$eq''). Include normalized metrics (carbon per accuracy point, per training sample, or per parameter) alongside totals to enable fair comparison across different scales.
+
+\section{Call to Action}
+
+We call on the ML community to take concrete steps toward normalizing carbon footprint reporting.
+
+\subsection{Venues and Reviewers}
+\label{sec:reviewers}
+
+Conference organizers hold the key to widespread adoption. We urge major venues (NeurIPS, ICML, ICLR) to add optional carbon reporting fields to submission forms within the next cycle (hardware, location, energy, carbon), commission best-practice guides, transition from optional to encouraged across subsequent stages, and publish annual aggregate statistics so the field can track its trajectory. Reviewers must understand that carbon reporting serves transparency, not gatekeeping: papers should never be penalized for reporting high carbon costs (which would create perverse incentives to underreport). Scrutiny should focus on two cases: (1) efficiency claims without energy data, and (2) massive compute yielding marginal gains over simpler baselines. High carbon is acceptable when justified; the goal is informed evaluation, not carbon-based rejection.
+
+\subsection{Researchers and Institutions}
+
+Authors need not wait for venue requirements. Voluntary adoption builds community norms. When reporting, authors should document measurement methodology clearly, including tool versions, hardware specifications, and data center locations. Research teams can begin by integrating measurement tools into their training pipelines and establishing lab-level reporting practices that normalize carbon awareness within their groups.
+
+Universities, national labs, and cloud providers can facilitate reporting by providing energy monitoring infrastructure and publishing PUE ratios and energy sources. Some institutions have begun offering carbon-aware scheduling, routing jobs to times when grid carbon intensity is lower. Institutional support is particularly important for researchers who lack direct access to power monitoring hardware; centralized infrastructure can provide the data that individual researchers cannot easily obtain.
+
+\paragraph{The incentive gap.} We should be candid about a structural disanalogy: code release confers direct reciprocal benefits (citations, downstream use, visibility) that carbon reporting does not. No extra citations accrue to reporting kWh, and intrinsic motivation alone will plateau adoption below code-release levels. Three mechanisms can partially close the gap: \emph{venue-level expectation} (as with the NeurIPS reproducibility checklist, which reached widespread adoption in two years \cite{pineau2021improving}); \emph{external pulls} from universities and funding agencies that increasingly require sustainability reporting, making paper-level carbon data directly reusable for institutional audits; and \emph{carbon-aware leaderboards} (Section~\ref{sec:tools-benchmarks}) that create a competitive signal accruing to authors. Acknowledging this asymmetry honestly is more useful than overstating the analogy: the proposal must work \emph{despite} the weaker incentive structure.
+
+\subsection{Preventing Gaming and Strategic Underreporting}
+
+Any reporting requirement creates incentives for strategic behavior. We identify two categories of potential gaming and propose mitigations.
+
+\textbf{Selective reporting scope.} Authors might cherry-pick which runs to include, reporting energy only for the best-performing run while averaging accuracy across multiple runs. Similarly, authors might define experiment boundaries to exclude expensive hyperparameter sweeps or omit preprocessing, data loading, and checkpointing from measurements. The measurement protocol addresses these concerns by requiring total energy across all averaged runs, separate reporting of search and training compute, and explicit documentation of what is excluded and why.
+
+\textbf{Carbon accounting manipulation.} Authors using renewable energy credits (RECs)\footnote{Tradable certificates representing proof that electricity was generated from renewable sources.} or carbon offsets might report only net emissions, obscuring gross energy consumption. Following GHG Protocol guidance, we require reporting of both gross and net emissions, with energy consumption in kWh reported independently. A related concern is location arbitrage, where authors route computation through low-carbon regions primarily for reporting optics. However, this is actually a positive outcome: if reporting incentivizes using cleaner grids, that represents genuine emissions reduction.
+
+We acknowledge that no reporting system is gaming-proof, but establishing clear norms makes egregious underreporting socially costly and statistically detectable.
+
+\subsection{Timeline for Adoption}
+\label{sec:timeline}
+
+We propose a phased transition in three stages, modeled on successful precedents: the shift from optional to expected code release, and the rapid adoption of NeurIPS reproducibility checklists \cite{pineau2021improving}. The timeline is deliberately gradual: each stage is designed to be \emph{minimal in itself} while producing the data and infrastructure that make the next stage realistic. The Stage 1 ask is intentionally tiny, only what 57.3\% of papers already partially provide (Section~\ref{sec:icml2025-survey}); Stage 2 builds on the aggregate carbon estimates that Stage 1 enables venues to compute; Stage 3 then applies full carbon accounting only to large-scale experiments, leveraging the empirical ranges established in Stage 2. This scaffolding is what distinguishes our proposal from a sudden mandate.
+
+\textbf{Stage 1: Foundation.} Major venues add optional carbon reporting fields to submission forms, asking for GPU-hours, hardware specifications (GPU model, count), and data center location if known. Reviewers check only that reported data is present and internally consistent---for example, 8 A100 GPUs for 24 hours at typical utilization should yield roughly 50--150 kWh depending on hardware variant and workload, and gross inconsistencies (e.g., order-of-magnitude errors) warrant clarification but not rejection. Venues host workshops and tutorials on measurement tools, and early adopters share case studies documenting their reporting experience.
+
+\textbf{Stage 2: Encouragement.} Venues publish aggregate statistics from submitted papers, establishing empirical ranges for different experiment types (e.g., fine-tuning a 7B model typically consumes 50--200 kWh; training a vision transformer from scratch typically consumes 500--2000 kWh). The expected requirement expands to measured energy (kWh) with acknowledged uncertainty bounds. Community benchmarks such as MLPerf incorporate efficiency metrics alongside accuracy. Third-party organizations including the Green Software Foundation offer voluntary verification services. Cross-venue data sharing agreements enable longitudinal analysis, and institutions begin offering carbon-aware job scheduling.
+
+\textbf{Stage 3: Normalization.} Reporting becomes a community expectation rather than an exception. For large-scale experiments (exceeding thresholds such as 1000 GPU-hours or 10,000 kWh), full reporting of all five metrics becomes standard: kWh, kgCO$_2$eq, grid intensity, region, and PUE. Independent auditing frameworks emerge for frontier model training, potentially aligned with ISO 14064 certification standards. Venues recognize verified reports with badges similar to artifact evaluation, and carbon-aware practices integrate into graduate curricula.
+
+Success at each stage is measured by concrete metrics: (1) \textit{Adoption rate}---targeting 30\% of papers including basic data (Stage 1), 50\% including measured energy (Stage 2), and 70\% meeting full requirements for applicable papers (Stage 3); (2) \textit{Data quality}---fraction of reports that are internally consistent and include uncertainty estimates; (3) \textit{Trend visibility}---ability to answer questions like ``Is NLP research becoming more carbon-efficient?'' with statistical confidence.
+
+\subsection{Privacy and Double-Blind Review}
+\label{sec:privacy-double-blind}
+
+Reporting grid carbon intensity, PUE, or compute region can substantially narrow author identity, conflicting with double-blind review. A rare data center, a national grid, or even a cloud availability zone can be enough to deanonymize a research group. We treat this as a first-order design constraint and propose two complementary mitigations. \textbf{Tiered visibility:} carbon metadata that exposes location is submitted as supplementary information visible only to area and program chairs, while reviewers see the de-identified portion (GPU hardware, energy in kWh, normalized carbon), which suffices for plausibility checks. \textbf{Reference-grid normalization during review:} authors report carbon normalized to a fixed reference grid (e.g., 475 gCO$_2$/kWh, the global average), revealing no geographic information; the actual region and grid intensity are disclosed only in the camera-ready. Venues can adopt either or combine both. Carbon transparency at publication and anonymity at review are compatible if the data flow is designed for both.
+
+\section{Alternative Views}
+
+A proposal of this scope raises legitimate concerns. We address four common objections.
+
+\subsection{Measurement Is Too Difficult}
+
+Critics argue accurate energy measurement requires specialized hardware or configurations many researchers lack, and different tools yield different numbers. We acknowledge this: software tools vary by 20--30\% from ground truth \cite{jay2023experimental} and exhibit systematic biases (CodeCarbon tends to underestimate relative to hardware meters), so we recommend reporting the tool and version used to enable cross-calibration. The barrier to entry is lower than commonly perceived: CodeCarbon requires only a pip install, major cloud providers offer built-in dashboards, and HPC clusters increasingly log energy at the job level via SLURM. We advocate tiered requirements: at minimum GPU-hours and hardware, ideally measured kWh, with full carbon accounting where feasible. Imperfect measurement is better than no measurement; astronomy and climate science routinely report uncertainty ranges, and even with 20--30\% error margins, energy data reveals order-of-magnitude differences and enables trend analysis.
+
+\subsection{Reporting Creates Barriers for Under-Resourced Groups}
+
+A more serious concern is equity. Researchers at well-funded institutions with efficient data centers will report lower carbon footprints than those at smaller institutions using older hardware or dirtier grids, which could disadvantage already-marginalized researchers. We acknowledge a tension in our proposal: while we recommend against using carbon as a review criterion (Section~\ref{sec:reviewers}), we also suggest that benchmarks incorporate carbon metrics (Section~\ref{sec:tools-benchmarks}), creating a foreseeable ``carbon leaderboard'' effect where high-carbon regions face reputational disadvantage even without formal acceptance penalties. We propose three mechanisms:
+
+\textbf{Dual reporting of energy and carbon.} Leaderboards should display both kWh (algorithmic/hardware efficiency, independent of location) and kgCO$_2$eq (full environmental impact). High-carbon regions can demonstrate strong energy efficiency even if carbon numbers are higher, distinguishing geographic constraints from engineering choices.
+
+\textbf{Reference-grid normalization.} For comparative rankings, venues could report carbon emissions normalized to a standard reference grid intensity (e.g., the global average of approximately 475 gCO$_2$/kWh). This ``what-if'' metric answers: ``What would this experiment emit on an average grid?'' Actual emissions should still be reported for transparency, but normalized values enable fairer cross-institution comparison of algorithmic efficiency. \emph{Dual reporting in practice.} Normalization can mislead in isolation: consider Experiment A in Quebec (1{,}000 kWh, 20 gCO$_2$/kWh; actual 20 kgCO$_2$eq, normalized 475 kgCO$_2$eq) versus Experiment B in Germany (400 kWh, 350 gCO$_2$/kWh; actual 140 kgCO$_2$eq, normalized 190 kgCO$_2$eq). Looking only at actual carbon, A appears far ``cleaner''; looking only at normalized, B appears more efficient. Both readings are partial; only the dual view shows that A is carbon-friendly today because of grid composition while B uses 60\% less energy and is the algorithmically more efficient method. Leaderboards displaying both numbers side-by-side prevent either misinterpretation.
+
+\textbf{Efficiency ratios over absolute values.} Metrics like kWh per accuracy point or gCO$_2$eq per billion parameters reward efficiency regardless of scale, recognizing scientific craftsmanship that absolute totals would obscure.
+
+For researchers in the Global South or at institutions with minimal infrastructure support, we recommend practical accommodations: software-based tools require only pip install, and approximate reporting (e.g., GPU-hours with estimated regional intensity) should be accepted when precise measurement is infeasible. The goal is inclusion, not exclusion. Reporting must never be a gatekeeping criterion: a breakthrough remains valuable regardless of its carbon cost; what matters is that the cost is known, so the community can weigh trade-offs explicitly rather than ignoring them.
+
+\subsection{Standards Are Premature}
+
+Some argue the field lacks consensus on measurement methods, and standardizing now will lock in imperfect approaches. We disagree: perfect standards are not required for useful reporting. The current state, where most papers report nothing, prevents progress on understanding the field's environmental trajectory, and even imperfect data enables trend analysis. Moreover, standardization drives improvement: once venues encourage reporting, tool developers gain stronger incentives to improve accuracy and the community converges on best practices through experience.
+
+\subsection{Focus Should Be on Industry, Not Academia}
+
+A fourth objection holds that academic research contributes a small fraction of total ML compute. The real environmental impact comes from industry training runs and deployed inference at scale. Requiring academics to report while industry operates opaquely is asymmetric and ineffective.
+
+We agree that industry must be part of the solution, but academic norms influence industry practice: researchers who learn to report environmental impact in graduate school carry these practices into industry roles, and academic venues can require that industry-sponsored publications meet the same standards, creating pressure for organizational transparency. As venues publish aggregate statistics, industry papers that report nothing become conspicuous outliers. The objection also underestimates academic impact: aggregate compute across thousands of papers is substantial, and academic research shapes what problems the field considers important; if efficiency and environmental impact become standard metrics in academic publications, industry will face pressure to adopt similar standards.
+
+\section{Conclusion}
+
+Carbon footprint reporting is the logical next step in the ML community's evolving reporting standards: efficiency claims without energy data are incomplete, analogous to reporting accuracy without specifying the test set. Systematic reporting would let us establish baselines, track progress, and answer questions we currently cannot (Is ML becoming more carbon-efficient? Do algorithmic gains translate to real energy savings?). The field has adopted comparably difficult norms before, including code release, NeurIPS reproducibility checklists \cite{pineau2021improving}, and Datasheets for Datasets \cite{gebru2021datasheets}, with transparency benefits outweighing costs. Equity must be designed in: dual energy-carbon reporting, reference-grid normalization, and approximate estimates make reporting inclusive rather than exclusionary. \textbf{Future work} extends this training-side proposal to inference, whose accumulating, deployment-dependent costs require domain-specific benchmarks (energy per 1000 tokens for LLMs, per 1000 images for vision, per sample for classical ML). The path forward requires coordination across venues, authors, and institutions; the tools and precedents exist, and this norm is overdue.
+
+\bibliography{carbon_position_paper}
+\bibliographystyle{icml2026}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDIX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\onecolumn
+
+\section{Glossary of Key Terms}
+\label{app:glossary}
+
+\begin{table}[h]
+\caption{Glossary of carbon footprint reporting terminology.}
+\label{tab:glossary}
+\begin{center}
+\begin{tabular}{p{4cm}p{11cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Carbon Footprint} & The total greenhouse gas emissions caused directly and indirectly by an activity, expressed as carbon dioxide equivalent (CO$_2$eq). \\
+\textbf{Carbon Intensity} & The amount of CO$_2$ emitted per unit of electricity generated, typically measured in gCO$_2$/kWh. Varies by region and time based on energy mix. \\
+\textbf{CO$_2$eq} & Carbon dioxide equivalent; a standard unit for measuring carbon footprints that converts all greenhouse gases to the equivalent amount of CO$_2$ based on global warming potential. \\
+\textbf{GPU-hours} & A measure of computational work equal to one GPU operating for one hour. Does not account for GPU utilization or power draw variations. \\
+\textbf{PUE} & Power Usage Effectiveness; the ratio of total facility energy to IT equipment energy. A PUE of 1.0 means all power goes to computing; typical data centers range from 1.1 to 2.0. \\
+\textbf{Scope 1 Emissions} & Direct emissions from owned or controlled sources (e.g., on-site generators). \\
+\textbf{Scope 2 Emissions} & Indirect emissions from purchased electricity, steam, heating, and cooling. Most ML carbon footprints fall here. \\
+\textbf{Scope 3 Emissions} & All other indirect emissions in the value chain, including hardware manufacturing and end-of-life disposal. \\
+\textbf{TDP} & Thermal Design Power; the maximum amount of heat a component is designed to dissipate, often used as a proxy for power consumption. \\
+\textbf{FLOPs} & Floating-point operations; a measure of computational work independent of hardware or energy consumption. \\
+\textbf{Embodied Carbon} & The carbon emissions associated with manufacturing, transporting, and disposing of hardware, distinct from operational emissions. \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Sample Carbon Reporting Templates}
+\label{app:templates}
+
+The three templates below correspond to the phased adoption stages described in Section~\ref{sec:timeline}. Each template specifies only the minimum required fields, but authors are encouraged to disclose additional context where available (e.g., job-level energy traces, intra-run grid intensity variation, or hardware utilization timelines) since such metadata accumulates value for community-level meta-analyses even when not strictly required at submission time.
+
+The templates follow a principle of \emph{progressive disclosure}: Stage 1 asks only for what most authors already know (hardware and runtime), Stage 2 adds a measured energy figure once tooling is in place, and Stage 3 collects the full set of variables needed to verify a carbon estimate from first principles. Authors at any stage may opt into a higher tier voluntarily, and we expect mixed adoption during the transition period. Reviewers should treat these templates as descriptive scaffolds rather than rigid checklists: a paper that reports four of the five Stage 3 fields with a clearly stated reason for the omission is more useful than one that reports five fields with no methodology trail.
+
+When values are estimated rather than measured, authors should mark them explicitly (e.g., ``estimated from TDP'') and report the assumption used. A consistent convention across the community, even at the cost of some precision, is more valuable than a patchwork of incompatible accounting choices.
+
+\begin{table}[!ht]
+\caption{Minimal reporting (Stage 1): GPU-hours and hardware only.}
+\label{tab:minimal-report}
+\begin{center}
+\begin{tabular}{p{5cm}p{10cm}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Hardware & 2$\times$ NVIDIA RTX 3090 \\
+Total GPU-hours & 48 \\
+Compute region & University cluster (unknown grid) \\
+\midrule
+\multicolumn{2}{p{15cm}}{\textit{Energy/carbon not measured; estimated $\sim$15 kWh based on TDP.}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\caption{Standard reporting (Stage 2): includes measured energy. \textit{Illustrative example; values are hypothetical.}}
+\label{tab:report-card}
+\begin{center}
+\begin{tabular}{p{5cm}p{10cm}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Hardware & 8$\times$ NVIDIA A100 (40GB) \\
+Total GPU-hours & 2,400 \\
+Compute region & US-West (California) \\
+Grid carbon intensity & 210 gCO$_2$/kWh \\
+Data center PUE & 1.1 \\
+\midrule
+Total energy (estimated) & 1,000 kWh \\
+Total carbon (estimated) & 210 kgCO$_2$eq \\
+\midrule
+Measurement tool & CodeCarbon v2.1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[h]
+\caption{Comprehensive reporting (Stage 3): full carbon accounting for large-scale experiments. \textit{Illustrative example; values are hypothetical.}}
+\label{tab:heavy-report}
+\begin{center}
+\begin{tabular}{p{5cm}p{10cm}}
+\toprule
+\textbf{Category} & \textbf{Details} \\
+\midrule
+\multicolumn{2}{l}{\textit{Hardware Configuration}} \\
+GPU Type & NVIDIA H100 (80GB) \\
+Number of GPUs & 256 \\
+CPU & AMD EPYC 7763 (per node) \\
+Interconnect & InfiniBand NDR 400Gb/s \\
+\midrule
+\multicolumn{2}{l}{\textit{Compute Summary}} \\
+Total GPU-hours & 86,016 (256 GPUs $\times$ 14 days) \\
+Average GPU Utilization & 78\% \\
+Peak Power Draw (measured) & 148 kW \\
+\midrule
+\multicolumn{2}{l}{\textit{Location \& Infrastructure}} \\
+Data Center Location & Iowa, USA \\
+Grid Carbon Intensity & 380 gCO$_2$/kWh (annual average) \\
+Renewable Energy Credits & 50\% offset claimed \\
+PUE & 1.08 \\
+\midrule
+\multicolumn{2}{l}{\textit{Energy \& Emissions}} \\
+Total Energy (measured) & 62,000 kWh \\
+Scope 2 Emissions (gross) & 23,560 kgCO$_2$eq \\
+Scope 2 Emissions (net, after RECs) & 11,780 kgCO$_2$eq \\
+\midrule
+\multicolumn{2}{l}{\textit{Contextual Comparisons}} \\
+Equivalent car miles & 59,000 miles \\
+Equivalent transatlantic flights & 13 round trips \\
+\midrule
+Measurement Method & Direct power metering + CodeCarbon validation \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\clearpage
+\section{Reference Data}
+\label{app:reference}
+
+\begin{table}[!ht]
+\caption{Grid carbon intensities by region (recent averages). Sources: Electricity Maps, IEA Emissions Factors 2025, Ember Global Electricity Review 2025, Carbon Brief.}
+\label{tab:grid-intensity}
+\begin{center}
+\small
+\begin{tabular}{p{3.5cm}p{2.5cm}p{5cm}}
+\toprule
+\textbf{Region} & \textbf{gCO$_2$/kWh} & \textbf{Cloud Zone} \\
+\midrule
+Quebec & 20 & GCP: na-northeast1 \\
+Norway & 29 & Azure: Norway East \\
+France & 60 & GCP: europe-west9 \\
+UK & 125 & Azure: UK South \\
+California & 210 & GCP: us-west1 \\
+Massachusetts & 280 & AWS: us-east-1 \\
+Germany & 350 & AWS: eu-central-1 \\
+US (average) & 384 & --- \\
+Global (average) & 475 & --- \\
+Poland & 500 & --- \\
+China & 560 & Alibaba: cn-hangzhou \\
+Australia & 650 & GCP: au-southeast1 \\
+India & 700 & AWS: ap-south-1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\caption{Typical GPU power consumption during training. TDP from NVIDIA/AMD specifications; typical training power at 80--85\% TDP.}
+\label{tab:gpu-power}
+\begin{center}
+\small
+\begin{tabular}{p{4cm}p{3cm}p{4cm}}
+\toprule
+\textbf{GPU} & \textbf{TDP} & \textbf{Typical Training} \\
+\midrule
+A10 & 150W & 120W \\
+V100 (32GB) & 300W & 250W \\
+L40 & 300W & 250W \\
+RTX 3090 & 350W & 290W \\
+A100 (40GB) & 400W & 330W \\
+A100 (80GB) & 400W & 350W \\
+RTX 4090 & 450W & 380W \\
+MI250X & 560W & 470W \\
+H100 (80GB) & 700W & 580W \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\caption{Representative training and inference costs that current ML papers leave unreported. Assumptions: US industrial electricity \$0.12/kWh; inference per-query energy from \cite{luccioni2024power,samsi2023words}.}
+\label{tab:cost-quantification}
+\begin{center}
+\small
+\begin{tabular}{p{5.5cm}p{2cm}p{2.5cm}p{3.5cm}}
+\toprule
+\textbf{System} & \textbf{Energy (MWh)} & \textbf{Carbon (tCO$_2$eq)} & \textbf{Equiv.} \\
+\midrule
+\multicolumn{4}{l}{\textit{Training (one-time)}} \\
+GPT-3 \cite{patterson2021carbon} & 1{,}287 & 552 & \$154K \\
+Llama-3.1 405B \cite{dubey2024llama3} & --- & 8{,}930 & 2{,}200 households \\
+\midrule
+\multicolumn{4}{l}{\textit{Inference (annual, 10M queries/day)}} \\
+0.003 kWh/query \cite{luccioni2024power,samsi2023words} & 10{,}950 & varies & training-scale \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\noindent\textbf{Formulas.} Total energy $= E_{\text{compute}} \times \text{PUE}$; carbon $= E_{\text{total}} \times I$ (grid intensity); energy estimate $= \text{GPU-hours} \times P_{\text{GPU}} \times U$ (GPU at 70--80\% TDP, plus 10--20\% overhead).
+
+\noindent\textbf{Usage.} The three tables compose multiplicatively. Table~\ref{tab:gpu-power} provides $P_{\text{GPU}}$, multiplying by GPU-hours yields compute energy, applying PUE gives total energy, and Table~\ref{tab:grid-intensity} converts energy to carbon by region. Authors lacking direct meter access can still produce a Stage-1 estimate from hardware specifications alone, and Table~\ref{tab:cost-quantification} provides scale anchors for situating the resulting numbers against published frontier-model training and inference costs.
+
+\clearpage
+\section{Existing Tools and Standards}
+\label{app:tools}
+
+\begin{table}[!ht]
+\caption{Overview of carbon footprint measurement tools for ML research.}
+\label{tab:tools}
+\begin{center}
+\begin{tabular}{p{3cm}p{4cm}p{7cm}}
+\toprule
+\textbf{Tool} & \textbf{Measurement Method} & \textbf{Features \& Limitations} \\
+\midrule
+CodeCarbon & Software-based power estimation using Intel RAPL\textsuperscript{a} and nvidia-smi\textsuperscript{b} & Easy integration with Python; cross-platform; may underestimate by 10--20\% compared to hardware meters \\
+Carbontracker & Software-based with hardware abstraction & Epoch-level tracking; predictive estimates; limited to Linux \\
+experiment-impact-tracker & Software-based with regional carbon data & Comprehensive logging; JSON output; academic-focused \\
+ML CO2 Impact & Web calculator using GPU-hours & Quick estimates; no code integration; uses average power values \\
+Cloud Carbon Footprint & Cloud provider APIs & Works with AWS, GCP, Azure; relies on provider-reported data \\
+\midrule
+\multicolumn{3}{l}{\textit{Hardware-based Methods}} \\
+Power meters (e.g., Watts Up Pro) & Direct electrical measurement & Most accurate; requires physical access; measures at outlet level \\
+IPMI/BMC sensors\textsuperscript{c} & Server-level power reporting & Built into enterprise servers; 5--10\% accuracy \\
+PDU metering\textsuperscript{d} & Rack-level power monitoring & Available in data centers; includes all equipment in rack \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.5em}
+\small{\textsuperscript{a}Running Average Power Limit, Intel's interface for energy consumption monitoring. \textsuperscript{b}NVIDIA System Management Interface, a command-line tool for querying GPU power draw. \textsuperscript{c}Intelligent Platform Management Interface / Baseboard Management Controller. \textsuperscript{d}Power Distribution Unit.}
+\end{table}
+
+\vspace{1em}
+\begin{table}[!ht]
+\caption{Relevant standards and frameworks for carbon reporting.}
+\label{tab:standards}
+\begin{center}
+\begin{tabular}{p{4cm}p{10cm}}
+\toprule
+\textbf{Standard/Framework} & \textbf{Description \& Relevance} \\
+\midrule
+GHG Protocol & The most widely used international standard for corporate carbon accounting. Defines Scope 1, 2, and 3 emissions categories. \\
+ISO 14064 & International standard for quantification and reporting of greenhouse gas emissions. Provides verification requirements. \\
+ISO 14067 & Standard specifically for carbon footprint of products, applicable to ML models as products. \\
+Science Based Targets initiative (SBTi) & Framework for setting emission reduction targets aligned with climate science. Increasingly adopted by tech companies. \\
+IEEE P2874 & Proposed standard for carbon footprint metrics specifically for AI systems (under development). \\
+Green Software Foundation & Industry consortium developing standards for sustainable software, including the Software Carbon Intensity (SCI) specification. \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Worked Example}
+\label{app:examples}
+
+A research team fine-tunes a 7B model: 4$\times$ A100 GPUs, 48 hours, Massachusetts (280 gCO$_2$/kWh), PUE 1.4.
+
+\textbf{Calculation:} GPU-hours = $4 \times 48 = 192$. GPU energy = $192 \times 0.33$ kW $\approx$ 63 kWh. With 15\% overhead and PUE: $63 \times 1.15 \times 1.4 \approx 102$ kWh. Carbon $\approx 102 \times 0.28 \approx 29$ kgCO$_2$eq ($\pm$20\%).
+
+\textbf{Report:} $\approx$29 kgCO$_2$eq ($\pm$20\%) $\approx$ 70 car miles. The same experiment in Quebec (20 gCO$_2$/kWh) would produce $\approx$2 kg; in Australia (650 gCO$_2$/kWh), $\approx$66 kg---a 33$\times$ variation.
+
+\end{document}
+
+% This document was modified from the file originally made available by
+% Pat Langley and Andrea Danyluk for ICML-2K. This version was created
+% by Iain Murray in 2018, and modified by Alexandre Bouchard in
+% 2019 and 2021 and by Csaba Szepesvari, Gang Niu and Sivan Sabato in 2022.
+% Modified again in 2023 and 2024 by Sivan Sabato and Jonathan Scarlett.
+% Previous contributors include Dan Roy, Lise Getoor and Tobias
+% Scheffer, which was slightly modified from the 2010 version by
+% Thorsten Joachims & Johannes Fuernkranz, slightly modified from the
+% 2009 version by Kiri Wagstaff and Sam Roweis's 2008 version, which is
+% slightly modified from Prasad Tadepalli's 2007 version which is a
+% lightly changed version of the previous year's version by Andrew
+% Moore, which was in turn edited from those of Kristian Kersting and
+% Codrina Lauth. Alex Smola contributed to the algorithmic style files.
