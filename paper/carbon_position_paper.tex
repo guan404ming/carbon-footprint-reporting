@@ -109,7 +109,7 @@
 % \printAffiliationsAndNotice{\icmlEqualContribution}
 
 \begin{abstract}
-In this position paper, we argue that the machine learning community should adopt standardized carbon footprint reporting as part of routine scientific practice. Training large models can emit hundreds of tons of CO$_2$, yet environmental costs remain largely invisible in publications. We contend that without energy and emissions metrics, claims of model efficiency are incomplete: a method cannot be deemed ``efficient'' without specifying efficient at what. This gap undermines scientific rigor and reproducibility, as identical experiments in different locations yield vastly different carbon footprints. We put forth reporting guidelines comprising five standardized metrics, practical measurement tools, and integration with community benchmarks, with a phased three-stage adoption process. We address alternative views, including concerns about measurement complexity and potential barriers for resource-limited researchers. To promote equity, we advocate for dual reporting of energy and carbon, reference-grid normalization, and acceptance of approximate estimates. This paper calls on venues, reviewers, authors, and institutions to establish carbon awareness as a foundational element of responsible ML research.
+We argue that the machine learning community should adopt standardized carbon footprint reporting as part of routine scientific practice. Training large models can emit hundreds of tons of CO$_2$, yet environmental costs remain largely invisible in publications, leaving efficiency claims scientifically incomplete and reproducibility undermined when identical experiments in different locations yield vastly different carbon footprints. We put forth reporting guidelines comprising five standardized metrics, practical measurement tools, and integration with community benchmarks, with a phased three-stage adoption process. We address alternative views, including measurement complexity and barriers for resource-limited researchers. To promote equity, we advocate for dual reporting of energy and carbon, reference-grid normalization, and acceptance of approximate estimates. This paper calls on venues, reviewers, authors, and institutions to establish carbon awareness as a foundational element of responsible ML research.
 \end{abstract}
 
 \section{Introduction}
@@ -136,6 +136,9 @@ We argue that \textbf{standardized carbon footprint reporting should become a ro
 This is not environmental activism but scientific completeness. Physicists report energy in collision experiments; chemists report temperature in synthesis protocols. ML researchers claiming efficient methods should report energy consumption. Our position rests on four observations: (1) efficiency claims require specifying efficient \textit{at what} (FLOPs, energy, carbon, or dollars); (2) reproducibility demands environmental context, as identical experiments in different locations yield vastly different carbon footprints; (3) the field lacks baselines to track sustainability over time; and (4) awareness plausibly drives change---while direct empirical evidence in ML is limited, analogous norms in other fields (code release, reproducibility checklists) suggest that what gets measured gets improved.
 
 Now is the time to act. Measurement tools exist, researcher awareness is growing, and prominent releases including BLOOM, OPT, and Llama have already included carbon data, proving such reporting is feasible.
+
+\paragraph{Conflict of Interest Disclosure.}
+The author declares no financial conflicts of interest; all third-party carbon and energy figures cited are reproduced from publicly disclosed reports.
 
 \section{Related Work}
 
