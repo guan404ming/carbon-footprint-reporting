@@ -1,6 +1,5 @@
 """Retry the 5 failed papers and update CSV."""
 
-import csv
 import io
 import re
 import time

@@ -1,11 +1,9 @@
 """Detailed per-paper analysis: extract exact paragraphs containing keyword matches."""
 
 import csv
-import io
 import json
 import os
 import re
-import sys
 
 from PyPDF2 import PdfReader
 
@@ -105,7 +103,7 @@ def extract_pages(pdf_path):
             if t:
                 pages.append({"page": i + 1, "text": t})
         return pages
-    except Exception as e:
+    except Exception:
         return []
 
 

@@ -1,4 +1,4 @@
-# Position: Carbon Footprint Reporting Should Be Routine in ML Research
+# Position: Carbon Footprint Reporting Should Be Routine in Machine Learning Research
 
 Accepted to ICML 2026 Position Paper Track. Go check out our [paper](paper/carbon_position_paper.pdf)! 🎉
 
@@ -57,7 +57,7 @@ Five standardized fields, three adoption stages:
 - **Fields:** energy (kWh), carbon (kgCO₂e), grid intensity (gCO₂/kWh), PUE, geographic location.
 - **Stages:** *(i)* opt-in templates, *(ii)* mandatory disclosure with reviewer prompts, *(iii)* benchmark integration with accuracy × carbon Pareto fronts.
 
-[`report_carbon.py`](report_carbon.py) is a minimal illustrative decorator showing how authors could emit the five fields in a uniform footer. It is a stub, real backends (CodeCarbon, Carbontracker, nvidia-smi) would supply the numbers:
+[`src/report_carbon.py`](src/report_carbon.py) is a minimal illustrative decorator showing how authors could emit the five fields in a uniform footer. It is a stub, real backends (CodeCarbon, Carbontracker, nvidia-smi) would supply the numbers:
 
 ```python
 @report_carbon(energy_kwh=85.2, grid_intensity_gco2_per_kwh=350, pue=1.2, location="Frankfurt, DE")
@@ -76,19 +76,26 @@ def train():
 - `paper/` — LaTeX source, figures, compiled PDF
 - `src/` — survey + per-paper analysis pipeline
 - `data/` — survey outputs (CSV/JSON + per-paper markdown report)
-- `report_carbon.py` — illustrative decorator for the proposed reporting format
+- `src/report_carbon.py` — illustrative decorator for the proposed reporting format
 - `docs/` — camera-ready notes, survey quickstart
 - `assets/` — README figures
 
 ## Scripts
 
 ```bash
+# Install dependencies (creates .venv via uv)
+uv sync
+
 # Survey ICML 2025 accepted papers (keyword search via OpenReview)
-python src/survey_carbon_reporting.py
+uv run python src/survey_carbon_reporting.py
 
 # Paragraph-level extraction (requires matched_pdfs/ corpus, ~2.9 GB, not redistributed)
-python src/detailed_analysis.py
-python src/generate_report.py
+uv run python src/detailed_analysis.py
+uv run python src/generate_report.py
+
+# Regenerate paper figures
+uv run python paper/generate_figures.py
+uv run python paper/generate_reporting_gap.py
 
 # Rebuild the paper
 cd paper && latexmk -pdf carbon_position_paper.tex

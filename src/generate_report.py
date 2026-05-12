@@ -196,7 +196,7 @@ def main():
                     })
 
     print(f"After filtering: {len(clean_papers)} papers remain")
-    print(f"\nRemoved false positives:")
+    print("\nRemoved false positives:")
     for kw, cnt in total_removed.most_common():
         print(f"  {kw}: {cnt} removed")
 
@@ -219,8 +219,8 @@ def main():
         carbon_papers = [p for p in clean_papers if p["categories"]["carbon"]]
 
         f.write("## Summary\n\n")
-        f.write(f"| Category | Papers | % of 995 valid |\n")
-        f.write(f"|----------|--------|----------------|\n")
+        f.write("| Category | Papers | % of 995 valid |\n")
+        f.write("|----------|--------|----------------|\n")
         f.write(f"| Compute metadata | {len(compute_papers)} | {100*len(compute_papers)//995}% |\n")
         f.write(f"| Energy data | {len(energy_papers)} | {100*len(energy_papers)//995}% |\n")
         f.write(f"| Carbon data | {len(carbon_papers)} | {100*len(carbon_papers)//995}% |\n\n")
@@ -257,7 +257,7 @@ def main():
     print(f"Report saved to {OUTPUT_REPORT}")
 
     # Final clean stats
-    print(f"\nFINAL CLEAN SUMMARY (n=995 valid papers)")
+    print("\nFINAL CLEAN SUMMARY (n=995 valid papers)")
     print(f"Compute metadata: {len(compute_papers)}/995 ({100*len(compute_papers)//995}%)")
     print(f"Energy data:      {len(energy_papers)}/995 ({100*len(energy_papers)//995}%)")
     print(f"Carbon data:      {len(carbon_papers)}/995 ({100*len(carbon_papers)//995}%)")
