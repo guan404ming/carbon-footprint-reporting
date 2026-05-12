@@ -24,8 +24,8 @@ Compute reporting is now common; energy and carbon reporting remain rare. The sa
 Disclosed training emissions span four orders of magnitude (BLOOM 25 t on France's low-carbon grid vs. Llama-3.1 405B at 8,930 t). Grid carbon intensity itself varies ~30× across regions, so dual reporting (energy and carbon) plus reference-grid normalization are necessary for fair comparison.
 
 <p align="center">
-  <img src="assets/carbon_by_model.png" height="240" alt="Training carbon by model"/>
-  <img src="assets/regional_comparison.png" height="240" alt="Regional grid intensity"/>
+  <img src="assets/carbon_by_model.png" width="48%" alt="Training carbon by model"/>
+  <img src="assets/regional_comparison.png" width="48%" alt="Regional grid intensity"/>
 </p>
 
 ## Survey

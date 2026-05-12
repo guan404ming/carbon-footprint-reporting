@@ -81,3 +81,19 @@ plt.savefig('figures/regional_comparison.pdf', bbox_inches='tight', pad_inches=0
 plt.savefig('figures/regional_comparison.png', bbox_inches='tight', pad_inches=0.3, dpi=300)
 plt.close()
 print("Saved: figures/regional_comparison.{pdf,png}")
+
+# Post-process: pad both side-by-side README PNGs to identical dimensions so
+# they render at the exact same height on GitHub at width="48%".
+from PIL import Image  # noqa: E402
+
+PAIR = ['figures/carbon_by_model.png', 'figures/regional_comparison.png']
+sizes = [Image.open(p).size for p in PAIR]
+target_w = max(w for w, _ in sizes)
+target_h = max(h for _, h in sizes)
+for path in PAIR:
+    img = Image.open(path).convert('RGB')
+    w, h = img.size
+    canvas = Image.new('RGB', (target_w, target_h), 'white')
+    canvas.paste(img, ((target_w - w) // 2, (target_h - h) // 2))
+    canvas.save(path)
+print(f"Padded README pair to {target_w}x{target_h}")
